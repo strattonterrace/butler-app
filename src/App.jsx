@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
 
@@ -23,21 +23,21 @@ function App() {
     return () => subscription.unsubscribe()
   }, [])
 
-  if (!session) {
-    return <Login />
-  } else {
-    const userRole = session.user.user_metadata?.role
-
-    return (
-      <Router>
-        <Routes>
-          <Route path="/" element={<h1>Welcome to Butler</h1>} />
-          <Route path="/dashboard/user" element={<UserDashboard />} />
-          <Route path="/dashboard/pa" element={<PaDashboard />} />
-        </Routes>
-      </Router>
-    )
-  }
+  return (
+    <Router>
+      <Routes>
+        {!session ? (
+          <Route path="*" element={<Login />} />
+        ) : (
+          <>
+            <Route path="/" element={<Navigate to="/dashboard/user" />} />
+            <Route path="/dashboard/user" element={<UserDashboard />} />
+            <Route path="/dashboard/pa" element={<PaDashboard />} />
+          </>
+        )}
+      </Routes>
+    </Router>
+  )
 }
 
 export default App
