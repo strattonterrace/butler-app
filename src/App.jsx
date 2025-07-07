@@ -1,51 +1,43 @@
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
 
 import Login from './pages/login'
 import UserDashboard from './pages/userDashboard'
-import PADashboard from './pages/paDashboard'
-
+import PaDashboard from './pages/paDashboard'
 
 function App() {
-  const [status, setStatus] = useState('⏳ Connecting to Supabase...')
+  const [session, setSession] = useState(null)
 
   useEffect(() => {
-    const testConnection = async () => {
-      const { data, error } = await supabase.from('test_table').select('*')
-      if (error) {
-        console.error(error)
-        setStatus('❌ Supabase is connected, but no table found (expected right now)')
-      } else {
-        setStatus('✅ Supabase connection SUCCESS')
-      }
-    }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session)
+    })
 
-    testConnection()
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session)
+    })
+
+    return () => subscription.unsubscribe()
   }, [])
 
-  return (
-    <div className="h-screen flex items-center justify-center bg-gray-100">
-      <h1 className="text-2xl font-bold text-blue-600">{status}</h1>
-    </div>
-  )
-}
+  if (!session) {
+    return <Login />
+  } else {
+    const userRole = session.user.user_metadata?.role
 
-export default App
-
-
-
-
-function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<h1>Home Page</h1>} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/dashboard/user" element={<userDashboard />} />
-        <Route path="/dashboard/pa" element={<paDashboard />} />
-      </Routes>
-    </Router>
-  )
+    return (
+      <Router>
+        <Routes>
+          <Route path="/" element={<h1>Welcome to Butler</h1>} />
+          <Route path="/dashboard/user" element={<UserDashboard />} />
+          <Route path="/dashboard/pa" element={<PaDashboard />} />
+        </Routes>
+      </Router>
+    )
+  }
 }
 
 export default App
