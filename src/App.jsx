@@ -32,7 +32,7 @@ function App() {
           <>
             <Route path="/" element={<Navigate to="/dashboard/user" />} />
             <Route path="/dashboard/user" element={<UserDashboard />} />
-            <Route path="/dashboard/pa" element={<PaDashboard />} />
+            <Route path="/dashboard/pa" element={<paDashboard />} />
           </>
         )}
       </Routes>
