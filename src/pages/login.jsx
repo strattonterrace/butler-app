@@ -12,39 +12,42 @@ function Login() {
     e.preventDefault()
     setError('')
 
-    const { data, error: loginError } = await supabase.auth.signInWithPassword({
+const handleLogin = async (e) => {
+  e.preventDefault()
+  setError('')
+
+  const { data: signInData, error: signInError } =
+    await supabase.auth.signInWithPassword({
       email,
       password,
     })
 
-    if (loginError) {
-      setError(loginError.message)
-      return
-    }
-
-    const user = data.user
-
-    // Now fetch their role from the users table
-    const { data: profile, error: profileError } = await supabase
-      .from('users')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    if (profileError) {
-      setError(profileError.message)
-      return
-    }
-
-    // Redirect based on role
-    if (profile.role === 'user') {
-      navigate('/dashboard/user')
-    } else if (profile.role === 'pa') {
-      navigate('/dashboard/pa')
-    } else {
-      setError('Unknown role. Please contact support.')
-    }
+  if (signInError) {
+    setError(signInError.message)
+    return
   }
+
+  const userEmail = signInData.session.user.email
+
+  // 🧠 Query the public users table using the email
+  const { data: userData, error: userError } = await supabase
+    .from('users')
+    .select('role')
+    .eq('email', userEmail)
+    .single()
+
+  if (userError) {
+    setError('Could not fetch user role.')
+    return
+  }
+
+  // ✅ Redirect based on role
+  if (userData.role === 'pa') {
+    navigate('/dashboard/pa')
+  } else {
+    navigate('/dashboard/user')
+  }
+}
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 px-4">
