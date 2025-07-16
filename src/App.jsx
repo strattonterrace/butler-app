@@ -1,40 +1,57 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
-
 import Login from './pages/login'
 import UserDashboard from './pages/userDashboard'
-import PaDashboard from './pages/paDashboard'
+import PADashboard from './pages/paDashboard'
+import ProtectedRoute from './components/protectedRoute'
+import Signup from './pages/signup'
+
 
 function App() {
-  const [session, setSession] = useState(null)
+  const [role, setRole] = useState(null)
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session)
-    })
+    const getRole = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session)
-    })
+      const { data, error } = await supabase
+        .from('users')
+        .select('role')
+        .eq('email', user?.email)
+        .single()
 
-    return () => subscription.unsubscribe()
+      if (data) {
+        setRole(data.role)
+      }
+    }
+
+    getRole()
   }, [])
 
-  return (
+ return (
     <Router>
       <Routes>
-        {!session ? (
-          <Route path="*" element={<Login />} />
-        ) : (
-          <>
-            <Route path="/" element={<Navigate to="/dashboard/user" />} />
-            <Route path="/dashboard/user" element={<UserDashboard />} />
-            <Route path="/dashboard/pa" element={<paDashboard />} />
-          </>
-        )}
+        <Route path="/" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route
+          path="/dashboard/user"
+          element={
+            <ProtectedRoute>
+              <UserDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/pa"
+          element={
+            <ProtectedRoute>
+              <PADashboard />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </Router>
   )

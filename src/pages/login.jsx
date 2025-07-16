@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../supabaseClient'
+import { Link } from 'react-router-dom';
+
 
 function Login() {
   const navigate = useNavigate()
@@ -73,8 +75,17 @@ function Login() {
           Log In
         </button>
       </form>
+      <div>
+       <p className="mt-4 text-center">
+          Don’t have an account?{' '}
+          <Link to="/signup" className="text-blue-500 underline">
+           Sign up here
+          </Link>
+      </p>
+      </div>
     </div>
   )
 }
-
 export default Login
+
+
