@@ -5,6 +5,7 @@ import Login from './pages/login'
 import Signup from './pages/signup'
 import UserDashboard from './pages/userDashboard'
 import PADashboard from './pages/paDashboard'
+import PAList from './pages/paList';
 import ProtectedRoute from './components/protectedRoute'
 
 
@@ -53,6 +54,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route path="/pa-list" element={<PAList />} />
       </Routes>
     </Router>
   )
