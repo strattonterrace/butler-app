@@ -2,10 +2,11 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { supabase } from './supabaseClient'
 import Login from './pages/login'
+import Signup from './pages/signup'
 import UserDashboard from './pages/userDashboard'
 import PADashboard from './pages/paDashboard'
 import ProtectedRoute from './components/protectedRoute'
-import Signup from './pages/signup'
+
 
 
 function App() {
